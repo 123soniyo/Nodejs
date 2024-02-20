@@ -1,0 +1,46 @@
+const http = require('http')
+const fs = require('fs')
+
+const server = http.createServer((req, res) => {
+    const url = req.url;
+    const method = req.method;
+    if(url==='/'){
+    res.write('<html><body><form action="/message" method = "POST"><label for="text">Enter Input:</label><input type="text" id="text" name="text"><button type="submit">submit</button></form></body></html>')
+    return res.end();
+    }
+
+    else if(url === '/message' && method === 'POST'){
+        const body =[]
+        req.on('data',(chunk)=>{
+            console.log(chunk)
+            body.push(chunk)
+
+        })
+    return req.on('end',()=>{
+            const paresBody = Buffer.concat(body).toString();
+            const message = paresBody.split('=')[1];
+            console.log("parsebody" , message)
+            fs.writeFile('demo.text',message,(err)=>{
+                console.log("succesfully write inside demo.text file")
+                res.statusCode =302;
+                res.setHeader('Location','/')
+                return res.end()
+            })
+            
+
+        })
+        // fs.writeFileSync('text.text',"hello shruti here!!")
+        // res.statusCode =302;
+        // return res.end()
+
+
+    }
+
+    
+
+   
+
+
+})
+
+server.listen(3000)
